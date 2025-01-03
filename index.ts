@@ -16,15 +16,18 @@ import reduce from 'lodash/reduce';
 import set from 'lodash/set';
 import size from 'lodash/size';
 import slice from 'lodash/slice';
+import snakeCase from 'lodash/snakeCase';
 import startsWith from 'lodash/startsWith';
 import trim from 'lodash/trim';
 import trimStart from 'lodash/trimStart';
 
+type QsCase = 'camelCase' | 'snake_case' | 'kebab-case';
 type QsOptions = {
 	addQueryPrefix?: boolean;
-	kebabCase?: boolean;
+	case?: QsCase;
 	omitValues?: any[] | ((value: any, key: string) => boolean);
 	prefix?: string;
+	restoreCase?: QsCase | false;
 };
 
 const SPECIAL_CHARS_REGEX = /[&=#]/;
@@ -42,7 +45,7 @@ const isEncoded = (value: string): boolean => {
 };
 
 const transformKey = (key: string, options?: QsOptions): string => {
-	if (!options?.kebabCase) {
+	if (!options?.case) {
 		return key;
 	}
 
@@ -55,14 +58,23 @@ const transformKey = (key: string, options?: QsOptions): string => {
 		const arrayParts = slice(splitParts, 1);
 
 		if (basePart) {
-			const kebabPart = kebabCase(basePart);
+			let casePart = basePart;
+
+			if (options.case === 'snake_case') {
+				casePart = snakeCase(basePart);
+			} else if (options.case === 'camelCase') {
+				casePart = camelCase(basePart);
+			} else if (options.case === 'kebab-case') {
+				casePart = kebabCase(basePart);
+			}
 
 			if (size(arrayParts) > 0) {
-				return `${kebabPart}[${arrayParts.join('[')}`;
-			} else {
-				return kebabPart;
+				return `${casePart}[${arrayParts.join('[')}`;
 			}
+
+			return casePart;
 		}
+
 		return '';
 	});
 
@@ -70,7 +82,9 @@ const transformKey = (key: string, options?: QsOptions): string => {
 };
 
 const reverseTransformKey = (key: string, options?: QsOptions): string => {
-	if (!options?.kebabCase) {
+	const restoreCase = options?.restoreCase ?? (options?.case ? 'camelCase' : false);
+
+	if (!restoreCase) {
 		return key;
 	}
 
@@ -81,12 +95,20 @@ const reverseTransformKey = (key: string, options?: QsOptions): string => {
 		const arrayParts = slice(splitParts, 1);
 
 		if (basePart) {
-			const camelPart = camelCase(basePart);
+			let casePart = basePart;
+
+			if (restoreCase === 'camelCase') {
+				casePart = camelCase(basePart);
+			} else if (restoreCase === 'snake_case') {
+				casePart = snakeCase(basePart);
+			} else if (restoreCase === 'kebab-case') {
+				casePart = kebabCase(basePart);
+			}
 
 			if (size(arrayParts) > 0) {
-				return `${camelPart}[${arrayParts.join('[')}`;
+				return `${casePart}[${arrayParts.join('[')}`;
 			} else {
-				return camelPart;
+				return casePart;
 			}
 		}
 		return '';

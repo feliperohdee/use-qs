@@ -148,9 +148,9 @@ describe('/index', () => {
 			});
 		});
 
-		describe('kebabCase option', () => {
+		describe('kebab-case', () => {
 			it('should parse kebab-case keys to camelCase', () => {
-				const options = { kebabCase: true };
+				const options = { case: 'kebab-case' as const };
 
 				expect(qs.parse('?first-name=John&last-name=Doe', options)).toEqual({
 					firstName: 'John',
@@ -158,8 +158,44 @@ describe('/index', () => {
 				});
 			});
 
+			it('should parse kebab-case keys to camelCase if restoreCase is camelCase', () => {
+				const options = {
+					case: 'kebab-case' as const,
+					restoreCase: 'camelCase' as const
+				};
+
+				expect(qs.parse('?first-name=John&last-name=Doe', options)).toEqual({
+					firstName: 'John',
+					lastName: 'Doe'
+				});
+			});
+
+			it('should parse kebab-case keys to snake_case if restoreCase is snake_case', () => {
+				const options = {
+					case: 'kebab-case' as const,
+					restoreCase: 'snake_case' as const
+				};
+
+				expect(qs.parse('?first-name=John&last-name=Doe', options)).toEqual({
+					first_name: 'John',
+					last_name: 'Doe'
+				});
+			});
+
+			it('should keep kebab-case if restoreCase is false', () => {
+				const options = {
+					case: 'kebab-case' as const,
+					restoreCase: false as const
+				};
+
+				expect(qs.parse('?first-name=John&last-name=Doe', options)).toEqual({
+					['first-name']: 'John',
+					['last-name']: 'Doe'
+				});
+			});
+
 			it('should handle nested kebab-case keys', () => {
-				const options = { kebabCase: true };
+				const options = { case: 'kebab-case' as const };
 
 				expect(qs.parse('?user-data.first-name=John&user-data.contact-info.phone-number=123', options)).toEqual({
 					userData: {
@@ -172,7 +208,7 @@ describe('/index', () => {
 			});
 
 			it('should handle arrays with kebab-case keys', () => {
-				const options = { kebabCase: true };
+				const options = { case: 'kebab-case' as const };
 
 				expect(qs.parse('?user-list[0].first-name=John&user-list[1].first-name=Jane', options)).toEqual({
 					userList: [{ firstName: 'John' }, { firstName: 'Jane' }]
@@ -180,9 +216,9 @@ describe('/index', () => {
 			});
 		});
 
-		describe('combined prefix and kebabCase options', () => {
+		describe('combined prefix and kebab-case options', () => {
 			it('should handle both prefix and kebab-case', () => {
-				const options = { prefix: 'api-', kebabCase: true };
+				const options = { prefix: 'api-', case: 'kebab-case' as const };
 
 				expect(qs.parse('?api-user-data.first-name=John&api-user-data.last-name=Doe', options)).toEqual({
 					userData: {
@@ -193,7 +229,7 @@ describe('/index', () => {
 			});
 
 			it('should handle complex nested structures with both options', () => {
-				const options = { prefix: 'api-', kebabCase: true };
+				const options = { prefix: 'api-', case: 'kebab-case' as const };
 				const input = '?api-user-list[0].contact-info.phone-numbers[0]=123&api-user-list[0].contact-info.phone-numbers[1]=456';
 
 				expect(qs.parse(input, options)).toEqual({
@@ -204,6 +240,17 @@ describe('/index', () => {
 							}
 						}
 					]
+				});
+			});
+		});
+
+		describe('snake_case', () => {
+			it('should parse snake_case keys to camelCase', () => {
+				const options = { case: 'snake_case' as const };
+
+				expect(qs.parse('?first_name=John&last_name=Doe', options)).toEqual({
+					firstName: 'John',
+					lastName: 'Doe'
 				});
 			});
 		});
@@ -416,9 +463,9 @@ describe('/index', () => {
 			});
 		});
 
-		describe('kebabCase option', () => {
+		describe('kebab-case', () => {
 			it('should stringify to kebab-case', () => {
-				const options = { kebabCase: true };
+				const options = { case: 'kebab-case' as const };
 				const input = {
 					firstName: 'John',
 					lastName: 'Doe'
@@ -428,7 +475,7 @@ describe('/index', () => {
 			});
 
 			it('should handle nested objects with kebab-case', () => {
-				const options = { kebabCase: true };
+				const options = { case: 'kebab-case' as const };
 				const input = {
 					userData: {
 						firstName: 'John',
@@ -442,7 +489,7 @@ describe('/index', () => {
 			});
 
 			it('should handle arrays with kebab-case', () => {
-				const options = { kebabCase: true };
+				const options = { case: 'kebab-case' as const };
 				const input = {
 					userList: [{ firstName: 'John' }, { firstName: 'Jane' }]
 				};
@@ -451,9 +498,9 @@ describe('/index', () => {
 			});
 		});
 
-		describe('combined prefix and kebabCase options', () => {
+		describe('combined prefix and kebab-case options', () => {
 			it('should handle both prefix and kebab-case', () => {
-				const options = { prefix: 'api-', kebabCase: true };
+				const options = { prefix: 'api-', case: 'kebab-case' as const };
 				const input = {
 					userData: {
 						firstName: 'John',
@@ -465,7 +512,7 @@ describe('/index', () => {
 			});
 
 			it('should handle complex nested structures with both options', () => {
-				const options = { prefix: 'api-', kebabCase: true };
+				const options = { prefix: 'api-', case: 'kebab-case' as const };
 				const input = {
 					userList: [
 						{
@@ -482,7 +529,7 @@ describe('/index', () => {
 			});
 
 			it('should maintain data integrity in round trips with both options', () => {
-				const options = { prefix: 'api-', kebabCase: true };
+				const options = { prefix: 'api-', case: 'kebab-case' as const };
 				const input = {
 					userData: {
 						firstName: 'John',
@@ -496,6 +543,18 @@ describe('/index', () => {
 				const parsed = qs.parse(stringified, options);
 
 				expect(parsed).toEqual(input);
+			});
+		});
+
+		describe('snake_case', () => {
+			it('should stringify to snake_case', () => {
+				const options = { case: 'snake_case' as const };
+				const input = {
+					firstName: 'John',
+					lastName: 'Doe'
+				};
+
+				expect(qs.stringify(input, options)).toEqual('?first_name=John&last_name=Doe');
 			});
 		});
 

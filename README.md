@@ -13,7 +13,7 @@ A TypeScript library that provides a powerful and flexible query string parsing 
 - 📦 Built-in Map and Set serialization
 - 🎯 Custom value transformations
 - 🔒 Prefix filtering for namespaced parameters
-- 🎨 Automatic kebab-case conversion
+- 🎨 Flexible case transformations (camelCase, snake_case, kebab-case)
 - 🧹 Configurable value omission
 - 🔍 Handles special characters and edge cases
 - 🎭 Maintains data integrity in round trips
@@ -57,6 +57,50 @@ const stringified = qs.stringify({
 // Result: '?user.name=John&user.skills[0]=js&user.skills[1]=ts'
 ```
 
+### Case Transformation Options
+
+#### CamelCase
+
+```typescript
+const options = { case: 'camelCase' };
+
+// Parsing to camelCase
+const parsed = qs.parse('?first_name=John&last-name=Doe', options);
+// Result: { firstName: 'John', lastName: 'Doe' }
+
+// Stringifying from camelCase
+const stringified = qs.stringify({ firstName: 'John', lastName: 'Doe' }, options);
+// Result: '?firstName=John&lastName=Doe'
+```
+
+#### Snake Case
+
+```typescript
+const options = { case: 'snake_case' };
+
+// Parsing snake_case
+const parsed = qs.parse('?first-name=John&lastName=Doe', options);
+// Result: { first_name: 'John', last_name: 'Doe' }
+
+// Stringifying to snake_case
+const stringified = qs.stringify({ firstName: 'John', lastName: 'Doe' }, options);
+// Result: '?first_name=John&last_name=Doe'
+```
+
+#### Kebab Case
+
+```typescript
+const options = { case: 'kebab-case' };
+
+// Parsing kebab-case
+const parsed = qs.parse('?first_name=John&lastName=Doe', options);
+// Result: { 'first-name': 'John', 'last-name': 'Doe' }
+
+// Stringifying to kebab-case
+const stringified = qs.stringify({ firstName: 'John', lastName: 'Doe' }, options);
+// Result: '?first-name=John&last-name=Doe'
+```
+
 ### Map and Set Support
 
 ```typescript
@@ -91,20 +135,6 @@ const stringified = qs.stringify({ name: 'John', age: 25 }, options);
 // Result: '?api-name=John&api-age=25'
 ```
 
-#### Kebab Case Option
-
-```typescript
-const options = { kebabCase: true };
-
-// Parsing kebab-case
-const parsed = qs.parse('?first-name=John&last-name=Doe', options);
-// Result: { firstName: 'John', lastName: 'Doe' }
-
-// Stringifying to kebab-case
-const stringified = qs.stringify({ firstName: 'John', lastName: 'Doe' }, options);
-// Result: '?first-name=John&last-name=Doe'
-```
-
 #### Omit Values Option
 
 ```typescript
@@ -127,9 +157,10 @@ const stringified = qs.stringify({
 ```typescript
 type QsOptions = {
 	addQueryPrefix?: boolean; // Add '?' prefix to stringified result
-	kebabCase?: boolean; // Convert between camelCase and kebab-case
+	case?: 'camelCase' | 'snake_case' | 'kebab-case'; // Case transformation option
 	omitValues?: any[] | ((value: any, key: string) => boolean); // Values to omit
 	prefix?: string; // Prefix for keys
+	restoreCase?: 'camelCase' | 'snake_case' | 'kebab-case' | false; // Restore case when parsing
 };
 ```
 
@@ -147,6 +178,7 @@ yarn test
 - Maintains type safety with TypeScript
 - Preserves data integrity in parse/stringify round trips
 - Handles special characters and edge cases gracefully
+- Supports flexible case transformations with restoration options
 
 ## 📝 License
 
