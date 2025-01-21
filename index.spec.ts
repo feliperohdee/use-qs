@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest';
-import qs from './index.js';
+import qs from './index';
 
 describe('/index', () => {
 	describe('parse', () => {
