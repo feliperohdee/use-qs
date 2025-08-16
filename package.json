@@ -1,11 +1,11 @@
 {
 	"devDependencies": {
 		"@types/lodash": "^4.17.13",
-		"@vitest/coverage-v8": "2.1.8",
+		"@vitest/coverage-v8": "^3.2.4",
 		"lodash": "^4.17.21",
 		"prettier": "^3.4.2",
 		"typescript": "^5.7.2",
-		"vitest": "^2.1.8"
+		"vitest": "^3.2.4"
 	},
 	"peerDependencies": {
 		"lodash": "^4.17.21"
@@ -24,8 +24,9 @@
 		"build": "rm -rf dist && yarn lint && tsc -p tsconfig.json",
 		"lint": "prettier --write . && tsc -p tsconfig.json",
 		"npm:publish": "yarn test --run && yarn build && yarn version --patch --no-git-tag-version && yarn publish --non-interactive",
-		"test": "vitest",
-		"test:coverage": "rm -rf coverage && vitest --run --coverage"
+		"test": "vitest --run",
+		"test:coverage": "rm -rf coverage && vitest --run --coverage",
+		"test:watch": "vitest"
 	},
 	"version": "1.0.5"
 }
